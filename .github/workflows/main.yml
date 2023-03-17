@@ -12,11 +12,10 @@ jobs:
       - name: check branch
         run: |
           echo ${{ github.head_ref }}
-          echo "main branch"
       
       - name: post slack
         run: |
           curl -X POST 'https://slack.com/api/chat.postMessage' \
             -d "token=${{ secrets.SLACK_BOT_TOKEN }}" \
-            -d "channel=#app-works" \
+            -d "channel=${{ secrets.SLACK_CHANNEL }}" \
             -d "text=*テスト投稿*"
