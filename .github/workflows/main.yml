@@ -13,9 +13,16 @@ jobs:
         run: |
           echo ${{ github.head_ref }}
       
+      - name: make messages
+        id: make_messages
+        run: |
+          msg="メンションのテスト\n"
+          msg+="notify to <@U04UULP3WM7>"
+          echo '::set-output name=messages::${msg}'
+
       - name: post slack
         run: |
           curl -X POST 'https://slack.com/api/chat.postMessage' \
             -d "token=${{ secrets.SLACK_BOT_TOKEN }}" \
             -d "channel=${{ secrets.SLACK_CHANNEL }}" \
-            -d "text=*テスト投稿*"
+            -d "text=${{ steps.make_messages.outputs.messages }}"
