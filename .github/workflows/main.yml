@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: check branch
         run: |
@@ -18,11 +18,11 @@ jobs:
         run: |
           msg="メンションのテスト\n"
           msg+="notify to <@U04UULP3WM7>"
-          echo '::set-output name=messages::${msg}'
+          echo "slk_msg=${msg}" >> $GITHUB_ENV
 
       - name: post slack
         run: |
           curl -X POST 'https://slack.com/api/chat.postMessage' \
             -d "token=${{ secrets.SLACK_BOT_TOKEN }}" \
             -d "channel=${{ secrets.SLACK_CHANNEL }}" \
-            -d "text=${{ steps.make_messages.outputs.messages }}"
+            -d "text=${{ env.slk_msg }}"
