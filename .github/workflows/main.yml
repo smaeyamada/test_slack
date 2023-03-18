@@ -23,7 +23,7 @@ jobs:
       - name: post slack
         env:
           # MSG: ${{ steps.make_messages.outputs.slk_msg }}
-          MSG: '[{"type": "section", "text": {"type": "plain_text", "text": "Hello world"}}]'
+          MSG: '[{"type": "context", "elements": [{"type": "mrkdwn", "text": "*Hello world*"}]}]'
         run: |
           curl -X POST 'https://slack.com/api/chat.postMessage' \
             -d "token=${{ secrets.SLACK_BOT_TOKEN }}" \
