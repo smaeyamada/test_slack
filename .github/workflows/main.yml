@@ -14,24 +14,25 @@ jobs:
           echo ${{ github.head_ref }}
       
       - name: create messages
-        run: echo "1st message\n" > temp.txt
+        run: |
+          msg="メンションのテスト\n"
+          msg+="notify to <@U04UULP3WM7>\n"
+          echo msg="${msg}" >> $GITHUB_ENV
 
       - name: next messages
         run: |
-          ls -l temp.txt
-          msg="warning message" && echo ${msg} >> temp.txt
+          msg="warning message"
+          echo "msg=${{ env.msg }}${msg}\n" >> $GITHUB_ENV
           echo "[warning] ${msg}"
-          msg="error message" && echo ${msg} >> temp.txt
+          msg="error message"
+          echo "msg=${{ env.msg }}${msg}\n" >> $GITHUB_ENV
           echo "[error] ${msg}"
 
       - name: make messages
         id: make_messages
         run: |
-          msg="メンションのテスト\n"
-          msg+="notify to <@U04UULP3WM7>\n"
-          msg+="$(cat temp.txt)"
           # echo "slk_msg=${msg}" >> $GITHUB_OUTPUT
-          msg_blk="[{\"type\": \"context\", \"elements\": [{\"type\": \"mrkdwn\", \"text\": \"${msg}\"}]}]"
+          msg_blk="[{\"type\": \"context\", \"elements\": [{\"type\": \"mrkdwn\", \"text\": \"${{ env.msg }}\"}]}]"
           echo "slk_msg=${msg_blk}" >> $GITHUB_OUTPUT
 
       - name: post slack
