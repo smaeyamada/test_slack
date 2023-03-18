@@ -61,11 +61,10 @@ jobs:
           echo "::group::check file"
           cat temp.txt
           echo "::endgroup::"
-          msg="$(sed -e 's/\[error\]/:x:/g' -e 's/\[warning\]/:warning:/g' temp.txt | sed -e 's/^:/\\n:/g')"
-          msg="$(echo ${msg})"
+          msg="$(sed -e 's/\[error\]/:x:/g' -e 's/\[warning\]/:warning:/g' temp.txt | sed -e 's/(.*)$/\1\\n/g')"
+          msg="$(echo ${msg})"    # "${msg}" にすると改行を含んでしまうので注意
           echo "${msg}"
           msg_blk="[{\"type\": \"context\", \"elements\": [{\"type\": \"mrkdwn\", \"text\": \"${msg}\"}]}]"
-          # msg_blk="[{\"type\": \"context\", \"elements\": [{\"type\": \"mrkdwn\", \"text\": \"${{ env.msg }}\"}]}]"
           echo "slk_msg=${msg_blk}" >> $GITHUB_OUTPUT
 
       - name: post slack
