@@ -27,7 +27,8 @@ jobs:
             -d "channel=${{ secrets.SLACK_CHANNEL }}" \
             -d "text=${MSG}" \
             -d "thread_ts=1679069687.520759" \
-            -d "reply_broadcast=false"
+            -d "reply_broadcast=false" \
+            -d "unfurl_links=false"
 
       - name: judge step
         id: judge_step
