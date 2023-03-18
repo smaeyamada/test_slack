@@ -49,19 +49,20 @@ jobs:
 
       - name: next messages
         run: |
-          echo "[error] error message" | tee -a test.txt
+          echo "[error] error message" | tee -a temp.txt
 
       - name: next messages2
         run: |
-          echo "[warning] warning message" | tee -a test.txt
+          echo "[warning] warning message" | tee -a temp.txt
 
       - name: make messages
         id: make_messages
         run: |
           echo "::group::check file"
-          cat test.txt
+          cat temp.txt
           echo "::endgroup::"
-          msg="$(sed -e 's/\[error\]/:x:/g' -e 's/\[warning\]/:warning:/g' test.txt)"
+          msg="$(sed -e 's/\[error\]/:x:/g' -e 's/\[warning\]/:warning:/g' temp.txt)"
+          echo "${msg}"
           msg_blk="[{\"type\": \"context\", \"elements\": [{\"type\": \"mrkdwn\", \"text\": \"${msg}\"}]}]"
           # msg_blk="[{\"type\": \"context\", \"elements\": [{\"type\": \"mrkdwn\", \"text\": \"${{ env.msg }}\"}]}]"
           echo "slk_msg=${msg_blk}" >> $GITHUB_OUTPUT
