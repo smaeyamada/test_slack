@@ -9,34 +9,56 @@ jobs:
       - name: checkout
         uses: actions/checkout@v3
 
-      - name: check branch
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
-      
-      - name: judge step
+      - name: make response messages
+        id: make_response_messages
         run: |
+          msg="Aggregation process *started*."
+          msg+=" (<${{ github.repository.html_url }}/actions/runs/${{ github.run_id }}|Github action log>"
+          msg_blk="[{\"type\": \"context\", \"elements\": [{\"type\": \"mrkdwn\", \"text\": \"${msg}\"}]}]"
+          echo "slk_msg=${msg_blk}" >> $GITHUB_OUTPUT
+
+      - name: response to slack
+        env:
+          MSG: ${{ steps.make_response_messages.outputs.slk_msg }}
+        run: |
+          curl -X POST 'https://slack.com/api/chat.postMessage' \
+            -d "token=${{ secrets.SLACK_BOT_TOKEN }}" \
+            -d "channel=${{ secrets.SLACK_CHANNEL }}" \
+            -d "text=${MSG}" \
+            -d "thread_ts=1679069687.520759" \
+            -d "reply_broadcast=false"
+
+      - name: judge step
+        id: judge_step
+        run: |
+          echo "[error] Error in this step."
+          wait 5
           exit 1
 
       - name: make messages
         id: make_messages
         if: ${{ always() }}
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
-          echo "$GITHUB_CONTEXT"
-          msg=""
+          msg="<@mention>\n"
+          msg+="Aggregation process *completed*."
+          msg+=" (<${{ github.repository.html_url }}/actions/runs/${{ github.run_id }}|Github action log>\n"
+          if [ ${{ steps.judge_step.outcome == 'success' }} ]; then
+            comment_url=${{ github.repository.html_url }}
+            msg+=":white_check_mark: Please check the <${comment_url}|PR comment>."
+          else
+            msg+=":x: Please check the log above."
+          fi
           msg_blk="[{\"type\": \"context\", \"elements\": [{\"type\": \"mrkdwn\", \"text\": \"${msg}\"}]}]"
           echo "slk_msg=${msg_blk}" >> $GITHUB_OUTPUT
 
-      # - name: post slack
-      #   if: ${{ always() }}
-      #   env:
-      #     MSG: ${{ steps.make_messages.outputs.slk_msg }}
-      #   run: |
-      #     curl -X POST 'https://slack.com/api/chat.postMessage' \
-      #       -d "token=${{ secrets.SLACK_BOT_TOKEN }}" \
-      #       -d "channel=${{ secrets.SLACK_CHANNEL }}" \
-      #       -d "blocks=${MSG}" \
-      #       -d "thread_ts=1679069687.520759" \
-      #       -d "reply_broadcast=false"
+      - name: post slack
+        if: ${{ always() }}
+        env:
+          MSG: ${{ steps.make_messages.outputs.slk_msg }}
+        run: |
+          curl -X POST 'https://slack.com/api/chat.postMessage' \
+            -d "token=${{ secrets.SLACK_BOT_TOKEN }}" \
+            -d "channel=${{ secrets.SLACK_CHANNEL }}" \
+            -d "blocks=${MSG}" \
+            -d "thread_ts=1679069687.520759" \
+            -d "reply_broadcast=false"
