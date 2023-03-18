@@ -13,9 +13,8 @@ jobs:
         id: make_response_messages
         run: |
           msg="Aggregation process *started*."
-          msg+=" (<${{ github.repository.html_url }}/actions/runs/${{ github.run_id }}|Github action log>"
-          msg_blk="[{\"type\": \"context\", \"elements\": [{\"type\": \"mrkdwn\", \"text\": \"${msg}\"}]}]"
-          echo "slk_msg=${msg_blk}" >> $GITHUB_OUTPUT
+          msg+=" (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|Github action log>"
+          echo "slk_msg=${msg}" >> $GITHUB_OUTPUT
 
       - name: response to slack
         env:
@@ -41,9 +40,9 @@ jobs:
         run: |
           msg="<@mention>\n"
           msg+="Aggregation process *completed*."
-          msg+=" (<${{ github.repository.html_url }}/actions/runs/${{ github.run_id }}|Github action log>\n"
+          msg+=" (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|Github action log>\n"
           if [ ${{ steps.judge_step.outcome == 'success' }} ]; then
-            comment_url=${{ github.repository.html_url }}
+            comment_url="${{ github.server_url }}"
             msg+=":white_check_mark: Please check the <${comment_url}|PR comment>."
           else
             msg+=":x: Please check the log above."
