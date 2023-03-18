@@ -25,8 +25,14 @@ jobs:
           echo "msg=${{ env.msg }}${msg}\n" >> $GITHUB_ENV
           echo "[warning] ${msg}"
           msg="error message"
-          echo "msg=${{ env.msg }}${msg}\n" >> $GITHUB_ENV
+          echo "msg=${{ env.msg }}${msg}\n" >> $GITHUB_ENV    # コレしか追加されない
           echo "[error] ${msg}"
+
+      - name: next messages2
+        run: |
+          msg="warning message2"
+          echo "msg=${{ env.msg }}${msg}\n" >> $GITHUB_ENV
+          echo "[warning] ${msg}"
 
       - name: make messages
         id: make_messages
