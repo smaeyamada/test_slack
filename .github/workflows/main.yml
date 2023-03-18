@@ -18,12 +18,11 @@ jobs:
         run: |
           msg="メンションのテスト\n"
           msg+="notify to <@U04UULP3WM7>"
-          echo "slk_msg={\"type\": \"mrkdwn\", \"text\": \"${msg}\"}" >> $GITHUB_OUTPUT
+          echo "slk_msg=${msg}" >> $GITHUB_OUTPUT
 
       - name: post slack
         env:
-          # MSG: ${{ steps.make_messages.outputs.slk_msg }}
-          MSG: '[{"type": "context", "elements": [{"type": "mrkdwn", "text": "*Hello world*"}]}]'
+          MSG: '[{"type": "context", "elements": [{"type": "mrkdwn", "text": "${{ steps.make_messages.outputs.slk_msg }}"}]}]'
         run: |
           curl -X POST 'https://slack.com/api/chat.postMessage' \
             -d "token=${{ secrets.SLACK_BOT_TOKEN }}" \
