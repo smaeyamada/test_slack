@@ -13,32 +13,57 @@ jobs:
         run: |
           echo ${{ github.head_ref }}
       
+      # - name: create messages
+      #   run: |
+      #     msg="メンションのテスト\n"
+      #     msg+="notify to <@U04UULP3WM7>\n"
+      #     echo "msg=${msg}" >> $GITHUB_ENV
+
+      # - name: next messages
+      #   run: |
+      #     msg="warning message"
+      #     echo "msg=${{ env.msg }}${msg}\n" >> $GITHUB_ENV
+      #     echo "[warning] ${msg}"
+      #     msg="error message"
+      #     echo "msg=${{ env.msg }}${msg}\n" >> $GITHUB_ENV    # 同一ステップ内だとココでmsg上書き
+      #     echo "[error] ${msg}"
+
+      # - name: next messages2
+      #   run: |
+      #     msg="warning message2"
+      #     echo "msg=${{ env.msg }}${msg}\n" >> $GITHUB_ENV
+      #     echo "[warning] ${msg}"
+
+      # - name: make messages
+      #   id: make_messages
+      #   run: |
+      #     # echo "slk_msg=${msg}" >> $GITHUB_OUTPUT
+      #     msg_blk="[{\"type\": \"context\", \"elements\": [{\"type\": \"mrkdwn\", \"text\": \"${{ env.msg }}\"}]}]"
+      #     echo "slk_msg=${msg_blk}" >> $GITHUB_OUTPUT
+
       - name: create messages
         run: |
           msg="メンションのテスト\n"
           msg+="notify to <@U04UULP3WM7>\n"
-          echo msg="${msg}" >> $GITHUB_ENV
+          echo "${msg}" > temp.txt
 
       - name: next messages
         run: |
-          msg="warning message"
-          echo "msg=${{ env.msg }}${msg}\n" >> $GITHUB_ENV
-          echo "[warning] ${msg}"
-          msg="error message"
-          echo "msg=${{ env.msg }}${msg}\n" >> $GITHUB_ENV    # コレしか追加されない
-          echo "[error] ${msg}"
+          echo "[error] error message" | tee -a test.txt
 
       - name: next messages2
         run: |
-          msg="warning message2"
-          echo "msg=${{ env.msg }}${msg}\n" >> $GITHUB_ENV
-          echo "[warning] ${msg}"
+          echo "[warning] warning message" | tee -a test.txt
 
       - name: make messages
         id: make_messages
         run: |
-          # echo "slk_msg=${msg}" >> $GITHUB_OUTPUT
-          msg_blk="[{\"type\": \"context\", \"elements\": [{\"type\": \"mrkdwn\", \"text\": \"${{ env.msg }}\"}]}]"
+          echo "::group::check file"
+          cat test.txt
+          echo "::endgroup::"
+          msg="$(sed -e 's/\[error\]/:x:/g' -e 's/\[warning\]/:warning:/g' test.txt)"
+          msg_blk="[{\"type\": \"context\", \"elements\": [{\"type\": \"mrkdwn\", \"text\": \"${msg}\"}]}]"
+          # msg_blk="[{\"type\": \"context\", \"elements\": [{\"type\": \"mrkdwn\", \"text\": \"${{ env.msg }}\"}]}]"
           echo "slk_msg=${msg_blk}" >> $GITHUB_OUTPUT
 
       - name: post slack
