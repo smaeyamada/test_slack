@@ -12,9 +12,11 @@ jobs:
       - name: make response messages
         id: make_response_messages
         run: |
+          action_log="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           msg="Aggregation process *started*."
-          msg+=" (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|Github action log>"
+          msg+=" (<${action_log}|GitHub action log>)"
           echo "slk_msg=${msg}" >> $GITHUB_OUTPUT
+          echo "action_log=${action_log}" >> $GITHUB_OUTPUT
 
       - name: response to slack
         env:
@@ -39,13 +41,12 @@ jobs:
         if: ${{ always() }}
         run: |
           msg="<@mention>\n"
-          msg+="Aggregation process *completed*."
-          msg+=" (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|Github action log>\n"
-          if [ ${{ steps.judge_step.outcome == 'success' }} ]; then
+          msg+="Aggregation process *completed*.\n"
+          if [ ${{ steps.judge_step.outcome }} == 'success' ]; then
             comment_url="${{ github.server_url }}"
             msg+=":white_check_mark: Please check the <${comment_url}|PR comment>."
           else
-            msg+=":x: Please check the log above."
+            msg+=":x: Please check the <${{ steps.make_response_messages.outputs.action_log }}|action log>."
           fi
           msg_blk="[{\"type\": \"context\", \"elements\": [{\"type\": \"mrkdwn\", \"text\": \"${msg}\"}]}]"
           echo "slk_msg=${msg_blk}" >> $GITHUB_OUTPUT
