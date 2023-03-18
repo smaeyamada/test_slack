@@ -10,72 +10,33 @@ jobs:
         uses: actions/checkout@v3
 
       - name: check branch
-        run: |
-          echo ${{ github.head_ref }}
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
       
-      # 環境変数を使うバージョン
-      # - name: create messages
-      #   run: |
-      #     msg="メンションのテスト\n"
-      #     msg+="notify to <@U04UULP3WM7>\n"
-      #     echo "msg=${msg}" >> $GITHUB_ENV
-
-      # - name: next messages
-      #   run: |
-      #     msg="warning message"
-      #     echo "msg=${{ env.msg }}${msg}\n" >> $GITHUB_ENV
-      #     echo "[warning] ${msg}"
-      #     msg="error message"
-      #     echo "msg=${{ env.msg }}${msg}\n" >> $GITHUB_ENV    # 同一ステップ内だとココでmsg上書き
-      #     echo "[error] ${msg}"
-
-      # - name: next messages2
-      #   run: |
-      #     msg="warning message2"
-      #     echo "msg=${{ env.msg }}${msg}\n" >> $GITHUB_ENV
-      #     echo "[warning] ${msg}"
-
-      # - name: make messages
-      #   id: make_messages
-      #   run: |
-      #     # echo "slk_msg=${msg}" >> $GITHUB_OUTPUT
-      #     msg_blk="[{\"type\": \"context\", \"elements\": [{\"type\": \"mrkdwn\", \"text\": \"${{ env.msg }}\"}]}]"
-      #     echo "slk_msg=${msg_blk}" >> $GITHUB_OUTPUT
-
-      - name: create messages
+      - name: judge step
         run: |
-          msg="メンションのテスト "
-          # msg+="notify to <@U04UULP3WM7>\n"
-          echo "${msg}" > temp.txt
-
-      - name: next messages
-        run: |
-          echo "[error] error message" | tee -a temp.txt
-
-      - name: next messages2
-        run: |
-          echo "[warning] warning message" | tee -a temp.txt
+          exit 1
 
       - name: make messages
         id: make_messages
+        if: ${{ always() }}
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
-          echo "::group::check file"
-          cat temp.txt
-          echo "::endgroup::"
-          msg="$(sed -e 's/\[error\]/:x:/g' -e 's/\[warning\]/:warning:/g' temp.txt | sed -e 's/^:/\\n:/g')"
-          msg="$(echo ${msg})"    # "${msg}" にすると改行を含んでしまうのでダブルクォーテーションで囲まない
-          echo "${msg}"
+          echo "$GITHUB_CONTEXT"
+          msg=""
           msg_blk="[{\"type\": \"context\", \"elements\": [{\"type\": \"mrkdwn\", \"text\": \"${msg}\"}]}]"
           echo "slk_msg=${msg_blk}" >> $GITHUB_OUTPUT
 
-      - name: post slack
-        env:
-          # MSG: '[{"type": "context", "elements": [{"type": "mrkdwn", "text": "${{ steps.make_messages.outputs.slk_msg }}"}]}]'
-          MSG: ${{ steps.make_messages.outputs.slk_msg }}
-        run: |
-          curl -X POST 'https://slack.com/api/chat.postMessage' \
-            -d "token=${{ secrets.SLACK_BOT_TOKEN }}" \
-            -d "channel=${{ secrets.SLACK_CHANNEL }}" \
-            -d "blocks=${MSG}" \
-            -d "thread_ts=1679068326.203699" \
-            -d "reply_broadcast=false"
+      # - name: post slack
+      #   if: ${{ always() }}
+      #   env:
+      #     MSG: ${{ steps.make_messages.outputs.slk_msg }}
+      #   run: |
+      #     curl -X POST 'https://slack.com/api/chat.postMessage' \
+      #       -d "token=${{ secrets.SLACK_BOT_TOKEN }}" \
+      #       -d "channel=${{ secrets.SLACK_CHANNEL }}" \
+      #       -d "blocks=${MSG}" \
+      #       -d "thread_ts=1679069687.520759" \
+      #       -d "reply_broadcast=false"
