@@ -44,7 +44,7 @@ jobs:
       - name: create messages
         run: |
           msg="メンションのテスト\n"
-          msg+="notify to <@U04UULP3WM7>\n"
+          # msg+="notify to <@U04UULP3WM7>\n"
           echo "${msg}" > temp.txt
 
       - name: next messages
@@ -61,7 +61,8 @@ jobs:
           echo "::group::check file"
           cat temp.txt
           echo "::endgroup::"
-          msg="$(sed -e 's/\[error\]/:x:/g' -e 's/\[warning\]/:warning:/g' temp.txt)"
+          msg="$(sed -e 's/\[error\]/:x:/g' -e 's/\[warning\]/:warning:/g' temp.txt | sed -e 's/^:/\\n:/g')"
+          msg="$(echo ${msg})"
           echo "${msg}"
           msg_blk="[{\"type\": \"context\", \"elements\": [{\"type\": \"mrkdwn\", \"text\": \"${msg}\"}]}]"
           # msg_blk="[{\"type\": \"context\", \"elements\": [{\"type\": \"mrkdwn\", \"text\": \"${{ env.msg }}\"}]}]"
