@@ -27,8 +27,8 @@ jobs:
           msg+="notify to <@U04UULP3WM7>\n"
           # msg+="$(cat temp.txt)"
           # echo "slk_msg=${msg}" >> $GITHUB_OUTPUT
-          msg_blk="[{"type": "context", "elements": [{"type": "mrkdwn", "text": "${msg}"}]}]"
-          echo "slk_msg=${{ fromJSON(${msg_blk}) }}" >> $GITHUB_OUTPUT
+          msg_blk=${{ fromJSON("[{"type": "context", "elements": [{"type": "mrkdwn", "text": "${msg}"}]}]") }}
+          echo "slk_msg=${msg_blk}" >> $GITHUB_OUTPUT
 
       - name: post slack
         env:
