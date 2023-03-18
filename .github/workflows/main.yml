@@ -33,7 +33,7 @@ jobs:
       - name: judge step
         id: judge_step
         run: |
-          wait 5
+          sleep 5
           # echo "[error] Error in this step."
           # exit 1
 
