@@ -15,17 +15,18 @@ jobs:
       
       - name: create messages
         run: echo "1st message\n" > temp.txt
+
       - name: next messages
         run: |
           ls -l temp.txt
-          echo "[debug] next message" | tee -a temp.txt
+          echo "[error] next message" | tee -a temp.txt
 
       - name: make messages
         id: make_messages
         run: |
           msg="メンションのテスト\n"
           msg+="notify to <@U04UULP3WM7>\n"
-          # msg+="$(cat temp.txt)"
+          msg+="$(cat temp.txt | sed -r 's/([]\[])/\\\1/g')"
           # echo "slk_msg=${msg}" >> $GITHUB_OUTPUT
           msg_blk="[{\"type\": \"context\", \"elements\": [{\"type\": \"mrkdwn\", \"text\": \"${msg}\"}]}]"
           echo "slk_msg=${msg_blk}" >> $GITHUB_OUTPUT
