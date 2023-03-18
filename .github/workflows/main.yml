@@ -25,5 +25,5 @@ jobs:
           curl -X POST 'https://slack.com/api/chat.postMessage' \
             -d "token=${{ secrets.SLACK_BOT_TOKEN }}" \
             -d "channel=${{ secrets.SLACK_CHANNEL }}" \
-            -d "thread_ts=1679068326203699" \
+            -d "thread_ts=p1679068326203699" \
             -d "text=${{ env.slk_msg }}"
