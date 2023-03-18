@@ -18,10 +18,11 @@ jobs:
         run: |
           msg="メンションのテスト\n"
           msg+="notify to <@U04UULP3WM7>"
-          echo "slk_msg=${msg}" >> $GITHUB_ENV
+          echo "slk_msg=${msg}" >> $GITHUB_OUTPUT
 
       - name: post slack
         run: |
+          echo "[debug] ${{ steps.make_messages.outputs.slk_msg }}"
           curl -X POST 'https://slack.com/api/chat.postMessage' \
             -d "token=${{ secrets.SLACK_BOT_TOKEN }}" \
             -d "channel=${{ secrets.SLACK_CHANNEL }}" \
