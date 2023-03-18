@@ -13,11 +13,19 @@ jobs:
         run: |
           echo ${{ github.head_ref }}
       
+      - name: create messages
+        run: echo "1st message\n" > temp.txt
+      - name: next messages
+        run: |
+          ls -l temp.txt
+          echo "[debug] next message" | tee -a temp.txt
+
       - name: make messages
         id: make_messages
         run: |
           msg="メンションのテスト\n"
-          msg+="notify to <@U04UULP3WM7>"
+          msg+="notify to <@U04UULP3WM7>\n"
+          msg+="$(cat temp.txt)"
           echo "slk_msg=${msg}" >> $GITHUB_OUTPUT
 
       - name: post slack
