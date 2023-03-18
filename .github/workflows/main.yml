@@ -33,9 +33,9 @@ jobs:
       - name: judge step
         id: judge_step
         run: |
-          echo "[error] Error in this step."
           wait 5
-          exit 1
+          # echo "[error] Error in this step."
+          # exit 1
 
       - name: make messages
         id: make_messages
